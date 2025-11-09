@@ -217,21 +217,21 @@
         </div>
     </div>
 
-	    <div class="details-modal-overlay" id="colorPickerModalOverlay">
-	        <div class="details-page auth-modal-content" style="max-width: 350px;">
-	            <div class="details-content">
-	                <button class="close-details-btn" onclick="closeColorPickerModal()">
-	                    <i class="fas fa-times"></i>
-	                </button>
-	                <h2 class="section-title" style="font-size: 24px; margin-bottom: 20px;"><i class="fas fa-palette"></i> اختر لون الموقع</h2>
-	                <div class="color-picker-grid" id="colorPickerGrid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 0 10px;">
-	                    <!-- Colors will be injected here by app.js -->
-	                </div>
-	            </div>
-	        </div>
-	    </div>
+    <div class="details-modal-overlay" id="colorPickerModalOverlay">
+        <div class="details-page auth-modal-content" style="max-width: 350px;">
+            <div class="details-content">
+                <button class="close-details-btn" onclick="closeColorPickerModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+                <h2 class="section-title" style="font-size: 24px; margin-bottom: 20px;"><i class="fas fa-palette"></i> اختر لون الموقع</h2>
+                <div class="color-picker-grid" id="colorPickerGrid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 0 10px;">
+                    <!-- Colors will be injected here by app.js -->
+                </div>
+            </div>
+        </div>
+    </div>
 
-	    <div class="details-modal-overlay" id="authModalOverlay">
+    <div class="details-modal-overlay" id="authModalOverlay">
         <div class="details-page auth-modal-content">
             <div class="details-content">
                 <button class="close-details-btn" onclick="closeAuthModal()">
@@ -249,9 +249,26 @@
     </div>
 
     
+    <!-- تحميل الملفات بالترتيب الصحيح - المجموعة الأولى (24 مسلسل) -->
+    <!-- 1. بيانات المسلسلات الأساسية - المجموعة الأولى -->
+    <script src="series1_data.js"></script>
     
-    <script src="series_data.js"></script>
+    <!-- 2. أوصاف الحلقات والأحداث - المجموعة الأولى -->
+    <script src="series1_descriptions.js"></script>
+    
+    <!-- 3. ملف المشغل الأول (AşkDiz) - المجموعة الأولى -->
+    <script src="series1_player1_embeds.js"></script>
+    
+    <!-- 4. ملف المشغل الثاني (Rumble) - المجموعة الأولى -->
+    <script src="series1_player2_embeds.js"></script>
+    
+    <!-- 5. أكواد تضمين المشغلين الأساسية -->
+    <script src="player_embeds.js"></script>
+    
+    <!-- 6. ملف التوثيق والمصادقة -->
     <script src="auth.js"></script>
+    
+    <!-- 7. ملف الجافاسكريبت الرئيسي -->
     <script src="app.js"></script>
     
     <!-- شريط حقوق الطبع والنشر -->

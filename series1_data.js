@@ -1,4 +1,4 @@
-// --- DATA SETUP: UPDATED EPISODE COUNTS --- //
+// --- DATA SETUP: SERIES 1 (24 SERIES) --- //
 
 // Helper function to generate placeholders
 const createPlaceholders = (start, count, seriesTitle) => {
@@ -12,8 +12,8 @@ const createPlaceholders = (start, count, seriesTitle) => {
     return { episodes, details };
 };
 
-// Series Data (Updated with new episode counts)
-const seriesData = [
+// Series Data - Series Group 1 (24 series)
+const series1Data = [
     {
         id: 1,
         title: "حلم اشرف",
@@ -54,7 +54,6 @@ const seriesData = [
         trailerId: "v3la1i8",
         isNew: false
     },
-    // --- المسلسلات الجديدة 2025 ---
     {
         id: 5,
         title: "الخليفة: نداء الجذور",
@@ -175,7 +174,6 @@ const seriesData = [
         trailerId: "v3lM12T1",
         isNew: true
     },
-    // --- تكملة المسلسلات الوهمية للوصول إلى 20 مسلسلًا جديدًا (من 17 إلى 20) ---
     {
         id: 17,
         title: "المدينة المخفية",
@@ -259,5 +257,5 @@ const seriesData = [
 ];
 
 // Export for global use
-window.seriesData = seriesData;
+window.series1Data = series1Data;
 window.createPlaceholders = createPlaceholders;

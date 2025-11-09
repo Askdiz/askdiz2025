@@ -5,6 +5,8 @@ let waitTimer = null;
 let currentState = 0; // 0: Aşk (red), 1: Clicked Aşk (diz fading), 2: Frame (Aşk diz white)
 let currentSeriesPage = 0;
 const SERIES_PER_PAGE = 30;
+let allSeriesData = []; // لجمع جميع بيانات المسلسلات من الملفات المختلفة
+let currentSeriesGroup = 1; // رقم المجموعة الحالية (1, 2, 3...)
 
 // --- TITLE ANIMATION LOGIC --- //
 const wordAsk = document.getElementById('word-ask');
@@ -270,7 +272,7 @@ function renderSeries(seriesArray, gridId = 'seriesGrid', isNewPage = false) {
                             <h3 class="series-title">${series.title}</h3>
                             <p class="series-title-en">${series.titleEn}</p>
                             <div class="series-meta">
-                                <span class="meta-item"><i class="fas fa-video"></i> ${series.episodes.length} حلقة</span>
+                                <span class="meta-item"><i class="fas fa-video"></i> ${series.episodes ? series.episodes.length : 0} حلقة</span>
                                 <span class="meta-item"><i class="fas fa-calendar-alt"></i> ${series.year}</span>
                             </div>
                         </div>
@@ -401,7 +403,7 @@ function openDetailsPage(seriesId) {
     document.getElementById('detailsBackdrop').style.backgroundImage = `url('${series.image}')`;
     document.getElementById('detailsMeta').innerHTML = `
         <span class="meta-item"><i class="fas fa-calendar-alt"></i> ${series.year}</span>
-        <span class="meta-item"> | <i class="fas fa-video"></i> ${series.episodes.length} حلقة</span>
+        <span class="meta-item"> | <i class="fas fa-video"></i> ${series.episodes ? series.episodes.length : 0} حلقة</span>
     `;
 
     // 2. Star Button (Rating)
@@ -439,29 +441,31 @@ function openDetailsPage(seriesId) {
     // 4. Episodes Grid (calls the new flow)
     const episodesGrid = document.getElementById('episodesGrid');
     episodesGrid.innerHTML = '';
-    series.episodes.forEach((url, index) => {
-        const episodeNum = index + 1;
-        const wrapper = document.createElement('div');
-        wrapper.className = 'episode-btn-wrapper';
-        
-        const heart = document.createElement('i');
-        heart.className = 'fas fa-heart episode-heart';
-        
-        const btn = document.createElement('button');
-        btn.className = 'episode-btn';
-        btn.textContent = episodeNum;
-        
-        // NEW: Use the new playback flow
-        btn.onclick = () => handlePlaybackFlow(seriesId, episodeNum);
-        
-        const heartBg = document.createElement('i');
-        heartBg.className = 'fas fa-heart episode-heart-bg';
-        
-        wrapper.appendChild(heartBg);
-        wrapper.appendChild(heart);
-        wrapper.appendChild(btn);
-        episodesGrid.appendChild(wrapper);
-    });
+    if (series.episodes) {
+        series.episodes.forEach((url, index) => {
+            const episodeNum = index + 1;
+            const wrapper = document.createElement('div');
+            wrapper.className = 'episode-btn-wrapper';
+            
+            const heart = document.createElement('i');
+            heart.className = 'fas fa-heart episode-heart';
+            
+            const btn = document.createElement('button');
+            btn.className = 'episode-btn';
+            btn.textContent = episodeNum;
+            
+            // NEW: Use the new playback flow
+            btn.onclick = () => handlePlaybackFlow(seriesId, episodeNum);
+            
+            const heartBg = document.createElement('i');
+            heartBg.className = 'fas fa-heart episode-heart-bg';
+            
+            wrapper.appendChild(heartBg);
+            wrapper.appendChild(heart);
+            wrapper.appendChild(btn);
+            episodesGrid.appendChild(wrapper);
+        });
+    }
     
     modalOverlay.style.display = 'flex';
     setTimeout(() => { modalOverlay.classList.add('active'); }, 10);
@@ -540,36 +544,10 @@ function playVideo(seriesId, episodeNum) {
     currentPlayingEpisode = episodeNum;
     
     // حفظ معلومات الحلقة للمشغلين
-    window.currentVideoInfo = {
-        seriesId: seriesId,
-        episodeNum: episodeNum,
-        videoId: getVideoId(series, episodeNum),
-        episodeName: getEpisodeName(series, episodeNum)
-    };
+    window.currentVideoInfo = createVideoInfo(seriesId, episodeNum);
     
     // إظهار نافذة اختيار المشغل
     showPlayerSelection();
-}
-
-function getVideoId(series, episodeNum) {
-    if (episodeNum === 0) {
-        return series.trailerId;
-    } else {
-        if (series.episodes && series.episodes[episodeNum - 1]) {
-            return series.episodes[episodeNum - 1];
-        } else {
-            console.error(`Video ID not found for series ${series.id}, episode ${episodeNum}`);
-            return 'v3l908a'; // معرّف افتراضي
-        }
-    }
-}
-
-function getEpisodeName(series, episodeNum) {
-    if (episodeNum === 0) {
-        return 'التريلر';
-    } else {
-        return `الحلقة ${episodeNum}`;
-    }
 }
 
 function showPlayerSelection() {
@@ -596,119 +574,37 @@ function selectPlayer(playerType) {
     closePlayerSelection();
     
     if (playerType === 'main') {
-        playMainPlayer();
+        if (typeof Player1Embeds !== 'undefined' && Player1Embeds.playMainPlayer) {
+            Player1Embeds.playMainPlayer(window.currentVideoInfo);
+        } else {
+            playMainPlayer(); // Fallback to old function
+        }
     } else if (playerType === 'rumble') {
-        playRumblePlayer();
+        if (typeof Player2Embeds !== 'undefined' && Player2Embeds.playRumblePlayer) {
+            Player2Embeds.playRumblePlayer(window.currentVideoInfo);
+        } else {
+            playRumblePlayer(); // Fallback to old function
+        }
     }
 }
 
+// Legacy functions for backward compatibility
 function playMainPlayer() {
     const videoInfo = window.currentVideoInfo;
     if (!videoInfo) return;
     
-    const series = seriesData.find(s => s.id === videoInfo.seriesId);
-    if (!series) return;
-
-    const videoPlayerContainer = document.getElementById('video_player_container');
-    const videoPlayer = document.getElementById('videoPlayer');
-    const currentEpisodeDescription = document.getElementById('episodeDescriptionBox');
-    const prevBtn = document.getElementById('prevEpisodeBtn');
-    const nextBtn = document.getElementById('nextEpisodeBtn');
-    
-    // مسح المشغل السابق
-    videoPlayerContainer.innerHTML = '';
-    
-    // فحص أزرار التنقل
-    prevBtn.disabled = videoInfo.episodeNum <= 1; // 1 هي الحلقة الأولى، 0 هو التريلر
-    nextBtn.disabled = videoInfo.episodeNum >= series.episodes.length;
-
-    // بناء رابط التضمين الجديد
-    const embedUrl = `https://askdiz-video-vault-23702.lovable.app/embed/${videoInfo.videoId}`;
-
-    // عرض وصف الحلقة
-    let descriptionHTML = '';
-    if (videoInfo.episodeNum > 0 && series.episodeDetails && series.episodeDetails[videoInfo.episodeNum - 1]) {
-        descriptionHTML = `<h4>${series.title} - ${videoInfo.episodeName}:</h4><p>${series.episodeDetails[videoInfo.episodeNum - 1]}</p>`;
-    } else if (videoInfo.episodeNum === 0) {
-        descriptionHTML = `<h4>${series.title} - ${videoInfo.episodeName}:</h4><p>شاهد العرض التشويقي الرسمي للمسلسل.</p>`;
-    } else {
-        descriptionHTML = `<h4>${series.title} - ${videoInfo.episodeName}:</h4><p>لا يتوفر وصف لهذه الحلقة.</p>`;
+    if (typeof Player1Embeds !== 'undefined' && Player1Embeds.playMainPlayer) {
+        Player1Embeds.playMainPlayer(videoInfo);
     }
-    currentEpisodeDescription.innerHTML = descriptionHTML;
-
-    // بناء iframe للمشغل
-    const iframe = document.createElement('iframe');
-    iframe.setAttribute('class', 'askdiz-player');
-    iframe.setAttribute('src', embedUrl);
-    iframe.setAttribute('frameborder', '0');
-    iframe.setAttribute('allowfullscreen', 'true');
-    iframe.setAttribute('allow', 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture');
-    iframe.setAttribute('allowfullscreen', 'true');
-    iframe.style.width = '100%';
-    iframe.style.height = '100%';
-    iframe.style.position = 'absolute';
-    
-    videoPlayerContainer.appendChild(iframe);
-    
-    videoPlayer.style.display = 'flex';
-    setTimeout(() => videoPlayer.classList.add('active'), 10);
 }
 
 function playRumblePlayer() {
     const videoInfo = window.currentVideoInfo;
     if (!videoInfo) return;
     
-    const series = seriesData.find(s => s.id === videoInfo.seriesId);
-    if (!series) return;
-
-    const videoPlayerContainer = document.getElementById('video_player_container');
-    const videoPlayer = document.getElementById('videoPlayer');
-    const currentEpisodeDescription = document.getElementById('episodeDescriptionBox');
-    const prevBtn = document.getElementById('prevEpisodeBtn');
-    const nextBtn = document.getElementById('nextEpisodeBtn');
-    
-    // مسح المشغل السابق
-    videoPlayerContainer.innerHTML = '';
-    
-    // فحص أزرار التنقل
-    prevBtn.disabled = videoInfo.episodeNum <= 1;
-    nextBtn.disabled = videoInfo.episodeNum >= series.episodes.length;
-
-    // عرض وصف الحلقة
-    let descriptionHTML = '';
-    if (videoInfo.episodeNum > 0 && series.episodeDetails && series.episodeDetails[videoInfo.episodeNum - 1]) {
-        descriptionHTML = `<h4>${series.title} - ${videoInfo.episodeName}:</h4><p>${series.episodeDetails[videoInfo.episodeNum - 1]}</p>`;
-    } else if (videoInfo.episodeNum === 0) {
-        descriptionHTML = `<h4>${series.title} - ${videoInfo.episodeName}:</h4><p>شاهد العرض التشويقي الرسمي للمسلسل.</p>`;
-    } else {
-        descriptionHTML = `<h4>${series.title} - ${videoInfo.episodeName}:</h4><p>لا يتوفر وصف لهذه الحلقة.</p>`;
+    if (typeof Player2Embeds !== 'undefined' && Player2Embeds.playRumblePlayer) {
+        Player2Embeds.playRumblePlayer(videoInfo);
     }
-    currentEpisodeDescription.innerHTML = descriptionHTML;
-
-    // استخدام معرف المشغل الثاني (rumbleEpisodes)
-    let rumbleVideoId = videoInfo.videoId; // المعرف الافتراضي
-    
-    if (videoInfo.episodeNum > 0 && series.rumbleEpisodes && series.rumbleEpisodes[videoInfo.episodeNum - 1]) {
-        // استخدام معرف المشغل الثاني
-        rumbleVideoId = series.rumbleEpisodes[videoInfo.episodeNum - 1];
-    }
-    
-    // بناء iframe لمشغل Rumble
-    const rumbleEmbedUrl = `https://rumble.com/embed/${rumbleVideoId}`;
-    const iframe = document.createElement('iframe');
-    iframe.setAttribute('class', 'askdiz-player');
-    iframe.setAttribute('src', rumbleEmbedUrl);
-    iframe.setAttribute('frameborder', '0');
-    iframe.setAttribute('allowfullscreen', 'true');
-    iframe.setAttribute('allow', 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen');
-    iframe.style.width = '100%';
-    iframe.style.height = '100%';
-    iframe.style.position = 'absolute';
-    
-    videoPlayerContainer.appendChild(iframe);
-    
-    videoPlayer.style.display = 'flex';
-    setTimeout(() => videoPlayer.classList.add('active'), 10);
 }
 
 function navigateEpisode(direction) {
@@ -814,6 +710,7 @@ window.closePlayerSelection = closePlayerSelection;
 window.selectPlayer = selectPlayer;
 window.playMainPlayer = playMainPlayer;
 window.playRumblePlayer = playRumblePlayer;
+
 function initializeEventListeners() {
     // Navigation Links
     document.getElementById('navHome').onclick = () => switchSection('series');
@@ -860,10 +757,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // عرض جميع المسلسلات بشكل افتراضي (غير مرتبة)
+        // استخدام الدالة المحسنة لدعم الملفات المتعددة
+        const currentGroup = getCurrentSeriesGroup();
+        const seriesData = getSeriesDataByGroup(currentGroup);
+        
         if (typeof seriesData !== 'undefined' && Array.isArray(seriesData)) {
             renderSeries(seriesData);
         } else {
-            console.error('seriesData is not defined or not an array. Check series_data.js loading.');
+            console.error(`series${currentGroup}Data is not defined or not an array. Check loading.`);
         }
         
         console.log('✅ تم تهيئة الموقع بنجاح');
@@ -879,3 +780,291 @@ window.addEventListener('resize', () => {
         closeNav();
     }
 });
+
+// === دوال إدارة ملفات البيانات المتعددة ===
+
+// دالة لجمع جميع بيانات المسلسلات من الملفات المختلفة
+function combineAllSeriesData() {
+    allSeriesData = [];
+    
+    // إضافة بيانات المجموعة الأولى إذا كانت متوفرة
+    if (typeof series1Data !== 'undefined' && Array.isArray(series1Data)) {
+        allSeriesData = allSeriesData.concat(series1Data);
+    }
+    
+    // إضافة بيانات المجموعة الثانية إذا كانت متوفرة
+    if (typeof series2Data !== 'undefined' && Array.isArray(series2Data)) {
+        allSeriesData = allSeriesData.concat(series2Data);
+    }
+    
+    return allSeriesData;
+}
+
+// دالة للحصول على بيانات مجموعة معينة
+function getSeriesDataByGroup(groupNumber) {
+    switch(groupNumber) {
+        case 1:
+            return typeof series1Data !== 'undefined' ? series1Data : [];
+        case 2:
+            return typeof series2Data !== 'undefined' ? series2Data : [];
+        case 3:
+            return typeof series3Data !== 'undefined' ? series3Data : [];
+        default:
+            return [];
+    }
+}
+
+// دالة للحصول على وصف حلقات مجموعة معينة
+function getSeriesEpisodesByGroup(groupNumber) {
+    switch(groupNumber) {
+        case 1:
+            return typeof series1Episodes !== 'undefined' ? series1Episodes : {};
+        case 2:
+            return typeof series2Episodes !== 'undefined' ? series2Episodes : {};
+        case 3:
+            return typeof series3Episodes !== 'undefined' ? series3Episodes : {};
+        default:
+            return {};
+    }
+}
+
+// دالة للحصول على embed codes مجموعة معينة
+function getSeriesEmbedsByGroup(groupNumber, playerNumber) {
+    switch(groupNumber) {
+        case 1:
+            if (playerNumber === 1) {
+                return typeof series1Player1Embeds !== 'undefined' ? series1Player1Embeds : {};
+            } else if (playerNumber === 2) {
+                return typeof series1Player2Embeds !== 'undefined' ? series1Player2Embeds : {};
+            }
+            break;
+        case 2:
+            if (playerNumber === 1) {
+                return typeof series2Player1Embeds !== 'undefined' ? series2Player1Embeds : {};
+            } else if (playerNumber === 2) {
+                return typeof series2Player2Embeds !== 'undefined' ? series2Player2Embeds : {};
+            }
+            break;
+        case 3:
+            if (playerNumber === 1) {
+                return typeof series3Player1Embeds !== 'undefined' ? series3Player1Embeds : {};
+            } else if (playerNumber === 2) {
+                return typeof series3Player2Embeds !== 'undefined' ? series3Player2Embeds : {};
+            }
+            break;
+        default:
+            return {};
+    }
+}
+
+// دالة لعرض زر "المزيد من المسلسلات" مع إمكانية الانتقال للمجموعة التالية
+function updateLoadMoreSection(groupNumber, totalSeries) {
+    const loadMoreSection = document.getElementById('loadMoreSection');
+    if (loadMoreSection) {
+        if (totalSeries >= 30) {
+            // إذا كان لدينا 30 مسلسل أو أكثر، نعرض زر الانتقال للمجموعة التالية
+            loadMoreSection.style.display = 'block';
+            loadMoreSection.innerHTML = `
+                <div class="load-more-content">
+                    <div class="load-more-text">
+                        <h3>هنالك المزيد من المسلسلات!</h3>
+                        <p>انقر لاستكشاف المجموعة ${groupNumber + 1} من المسلسلات الرائعة</p>
+                    </div>
+                    <button class="load-more-btn" onclick="goToNextSeriesGroup(${groupNumber + 1})">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+                        </svg>
+                        تصفح المجموعة ${groupNumber + 1}
+                    </button>
+                </div>
+            `;
+        } else {
+            loadMoreSection.style.display = 'none';
+        }
+    }
+}
+
+// دالة للانتقال للمجموعة التالية من المسلسلات
+function goToNextSeriesGroup(groupNumber) {
+    // حفظ المجموعة الحالية في sessionStorage
+    sessionStorage.setItem('currentSeriesGroup', groupNumber.toString());
+    
+    // الانتقال لصفحة المجموعة الجديدة
+    if (groupNumber === 2) {
+        window.location.href = 'series2.html';
+    } else {
+        // يمكن إضافة المزيد من المجموعات لاحقاً
+        alert(`المجموعة ${groupNumber} ستكون متاحة قريباً!`);
+    }
+}
+
+// دالة للعودة للمجموعة الأولى
+function goToFirstSeriesGroup() {
+    sessionStorage.removeItem('currentSeriesGroup');
+    window.location.href = 'index.html';
+}
+
+// دالة للحصول على مجموعة المسلسلات الحالية
+function getCurrentSeriesGroup() {
+    // التحقق من sessionStorage أولاً
+    const savedGroup = sessionStorage.getItem('currentSeriesGroup');
+    if (savedGroup) {
+        return parseInt(savedGroup);
+    }
+    return currentSeriesGroup;
+}
+
+// تحديث دالة renderSeries لدعم الملفات المتعددة
+function renderSeriesAdvanced(seriesArray, gridId = 'seriesGrid', isNewPage = false) {
+    const seriesGrid = document.getElementById(gridId);
+    if (!seriesGrid) return; 
+    
+    if (!Array.isArray(seriesArray)) {
+        console.error('Error: seriesArray is not a valid array.');
+        return;
+    }
+
+    // دالة مساعدة لإنشاء بطاقة المسلسل
+    const createSeriesCard = (series) => {
+        // تعتمد على calculateTotalStars من ملف auth.js
+        const totalStars = typeof calculateTotalStars === 'function' ? calculateTotalStars(series.id) : 0;
+        
+        return `
+            <div class="series-card" onclick="openDetailsPage(${series.id})">
+                <div class="heart-shape-wrapper">
+                    <div class="series-image-wrapper">
+                        <img src="${series.image}" alt="${series.title}" class="series-image">
+                        
+                        <span class="series-badge" style="background: var(--primary-light); color: var(--secondary); border: 2px solid var(--primary); font-size: 14px;">
+                            <i class="fas fa-star" style="color: var(--primary);"></i> ${totalStars} 
+                        </span>
+                        
+                        <div class="series-overlay">
+                            <h3 class="series-title">${series.title}</h3>
+                            <p class="series-title-en">${series.titleEn}</p>
+                            <div class="series-meta">
+                                <span class="meta-item"><i class="fas fa-video"></i> ${series.episodes ? series.episodes.length : 0} حلقة</span>
+                                <span class="meta-item"><i class="fas fa-calendar-alt"></i> ${series.year}</span>
+                            </div>
+                            <p class="series-description">${series.description.length > 100 ? series.description.substring(0, 100) + '...' : series.description}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+
+    if (isNewPage) {
+        // إضافة مسلسلات جديدة للصفحة الحالية
+        const startIndex = currentSeriesPage * SERIES_PER_PAGE;
+        const endIndex = startIndex + SERIES_PER_PAGE;
+        const pageSeries = seriesArray.slice(startIndex, endIndex);
+        seriesGrid.innerHTML += pageSeries.map(createSeriesCard).join('');
+    } else {
+        // عرض الصفحة الأولى
+        currentSeriesPage = 0;
+        const firstPageSeries = seriesArray.slice(0, SERIES_PER_PAGE);
+        seriesGrid.innerHTML = firstPageSeries.map(createSeriesCard).join('');
+    }
+
+    // تحديث زر "المزيد من المسلسلات"
+    const currentGroup = getCurrentSeriesGroup();
+    updateLoadMoreSection(currentGroup, seriesArray.length);
+}
+
+// دالة محسنة لعرض المسلسلات تدعم الملفات المتعددة
+function renderSeries(seriesArray, gridId = 'seriesGrid', isNewPage = false) {
+    // استخدام الدالة المحسنة للملفات المتعددة
+    renderSeriesAdvanced(seriesArray, gridId, isNewPage);
+}
+
+// دالة محسنة للبحث تدعم الملفات المتعددة
+function performSearch() {
+    const input = document.getElementById('seriesSearchInput').value.toLowerCase().trim();
+    if (input.length === 0) return;
+
+    // جمع البيانات من جميع الملفات
+    const allData = combineAllSeriesData();
+    
+    const filteredSeries = allData.filter(series => {
+        const titleMatch = series.title.toLowerCase().includes(input);
+        const titleEnMatch = series.titleEn.toLowerCase().includes(input);
+        return titleMatch || titleEnMatch;
+    });
+
+    openSearchModal(filteredSeries);
+}
+
+// دالة محسنة لتحميل المزيد من المسلسلات
+function loadMoreSeries() {
+    const currentGroup = getCurrentSeriesGroup();
+    const seriesData = getSeriesDataByGroup(currentGroup);
+    
+    if (typeof seriesData !== 'undefined' && Array.isArray(seriesData)) {
+        currentSeriesPage++;
+        renderSeries(seriesData, 'seriesGrid', true);
+    }
+}
+
+// دالة للحصول على embed URL يدعم الملفات المتعددة
+function getEmbedURL(seriesId, episodeIndex, playerIndex) {
+    const currentGroup = getCurrentSeriesGroup();
+    const currentGroupData = getSeriesDataByGroup(currentGroup);
+    const embedData = getSeriesEmbedsByGroup(currentGroup, playerIndex);
+    
+    // البحث عن المسلسل في البيانات الحالية
+    const series = currentGroupData.find(s => s.id === seriesId);
+    if (!series) {
+        console.error(`Series with ID ${seriesId} not found in group ${currentGroup}`);
+        return null;
+    }
+    
+    // الحصول على embed code
+    const seriesEmbeds = embedData[seriesId];
+    if (!seriesEmbeds) {
+        console.error(`Embed data for series ${seriesId} not found`);
+        return null;
+    }
+    
+    const episodeKey = `e${episodeIndex + 1}`;
+    const embedURL = seriesEmbeds[episodeKey];
+    
+    if (!embedURL) {
+        console.error(`Episode ${episodeIndex + 1} for series ${seriesId} not found`);
+        return null;
+    }
+    
+    return embedURL;
+}
+
+// دالة للحصول على معرف Episode via ID supports multiple files
+function getPlayerEmbedById(embedId, playerId) {
+    const currentGroup = getCurrentSeriesGroup();
+    const embedData = getSeriesEmbedsByGroup(currentGroup, playerId);
+    
+    // البحث في جميع مسلسلات المجموعة
+    for (const seriesId in embedData) {
+        for (const episodeKey in embedData[seriesId]) {
+            if (embedData[seriesId][episodeKey] === embedId) {
+                return embedData[seriesId][episodeKey];
+            }
+        }
+    }
+    
+    return null;
+}
+
+// Export functions for global access
+window.combineAllSeriesData = combineAllSeriesData;
+window.getSeriesDataByGroup = getSeriesDataByGroup;
+window.getSeriesEpisodesByGroup = getSeriesEpisodesByGroup;
+window.getSeriesEmbedsByGroup = getSeriesEmbedsByGroup;
+window.updateLoadMoreSection = updateLoadMoreSection;
+window.goToNextSeriesGroup = goToNextSeriesGroup;
+window.goToFirstSeriesGroup = goToFirstSeriesGroup;
+window.getCurrentSeriesGroup = getCurrentSeriesGroup;
+window.renderSeriesAdvanced = renderSeriesAdvanced;
+window.loadMoreSeries = loadMoreSeries;
+window.performSearch = performSearch;
+window.getEmbedURL = getEmbedURL;
+window.getPlayerEmbedById = getPlayerEmbedById;
