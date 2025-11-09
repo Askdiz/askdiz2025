@@ -26,6 +26,10 @@ const seriesData = [
             "AE7PZDK1",
             "AE7PZDK1",
             "v3l9494",
+            "v3l94b8",
+            "AE7PZDK1",
+            "AE7PZDK1",
+            "v3l9494",
             "v3l94b8"
         ],
         
@@ -34,7 +38,11 @@ const seriesData = [
             "v6z5ujg",      // الحلقة 1 - المشغل الثاني (كما طلبت)
             "AE7PZDK1",     // الحلقة 2 - المشغل الثاني (استخدمت المعرف الموجود)
             "v9a2b3c",      // الحلقة 3 - مشغل ثاني
-            "v4d5e6f"       // الحلقة 4 - مشغل ثاني
+            "v4d5e6f",
+            "AE7PZDK1",
+            "AE7PZDK1",
+            "v3l9494",
+            "v3l94b8"// الحلقة 4 - مشغل ثاني
         ],
         
         episodeDetails: [
@@ -254,7 +262,7 @@ const seriesData = [
         trailerId: "v3lM12T1",
         isNew: true
     },
-    // --- تكملة المسلسلات الوهمية للوصول إلى 20 مسلسلًا جديدًا (من 17 إلى 20) ---
+   // --- تكملة المسلسلات الوهمية للوصول إلى 20 مسلسلًا جديدًا (من 17 إلى 20) ---
     {
         id: 17,
         title: "المدينة المخفية",
@@ -267,7 +275,7 @@ const seriesData = [
         trailerId: "v3lN13T1",
         isNew: true
     },
-    {
+   {
         id: 18,
         title: "أطفال الجنة",
         titleEn: "Cennetin Çocukları",
@@ -342,6 +350,66 @@ const seriesData = [
     {
         id: 24,
         title: "إيقاع الحياة",
+        titleEn: "Hayatın Ritmi",
+        image: "https://placeholder.com/image/hayat.jpg",
+        description: "قصة ملهمة حول موسيقيين شباب يسعون لتحقيق أحلامهم في إسطنبول.",
+        episodes: ["v3lU2001"],
+        episodeDetails: ["الحلقة 1: لا يتوفر وصف مفصل لهذه الحلقة من مسلسل إيقاع الحياة."],
+        year: 2025,
+        trailerId: "v3lU20T1",
+        isNew: true
+    },
+    {
+        id: 26,
+        title: "شراب التوت ",
+        titleEn: "Hayatın Ritmi",
+        image: "https://placeholder.com/image/hayat.jpg",
+        description: "قصة ملهمة حول موسيقيين شباب يسعون لتحقيق أحلامهم في إسطنبول.",
+        episodes: ["v3lU2001"],
+        episodeDetails: ["الحلقة 1: لا يتوفر وصف مفصل لهذه الحلقة من مسلسل إيقاع الحياة."],
+        year: 2025,
+        trailerId: "v3lU20T1",
+        isNew: true
+    },
+    {
+        id: 27,
+        title: "الضائع المسكين",
+        titleEn: "Hayatın Ritmi",
+        image: "https://placeholder.com/image/hayat.jpg",
+        description: "قصة ملهمة حول موسيقيين شباب يسعون لتحقيق أحلامهم في إسطنبول.",
+        episodes: ["v3lU2001"],
+        episodeDetails: ["الحلقة 1: لا يتوفر وصف مفصل لهذه الحلقة من مسلسل إيقاع الحياة."],
+        year: 2025,
+        trailerId: "v3lU20T1",
+        isNew: true
+    },
+    {
+        id: 28,
+        title: "شخص آخر",
+        titleEn: "Hayatın Ritmi",
+        image: "https://placeholder.com/image/hayat.jpg",
+        description: "قصة ملهمة حول موسيقيين شباب يسعون لتحقيق أحلامهم في إسطنبول.",
+        episodes: ["v3lU2001"],
+        episodeDetails: ["الحلقة 1: لا يتوفر وصف مفصل لهذه الحلقة من مسلسل إيقاع الحياة."],
+        year: 2025,
+        trailerId: "v3lU20T1",
+        isNew: true
+    },
+    {
+        id: 29,
+        title: "هذا هو ابي",
+        titleEn: "Hayatın Ritmi",
+        image: "https://placeholder.com/image/hayat.jpg",
+        description: "قصة ملهمة حول موسيقيين شباب يسعون لتحقيق أحلامهم في إسطنبول.",
+        episodes: ["v3lU2001"],
+        episodeDetails: ["الحلقة 1: لا يتوفر وصف مفصل لهذه الحلقة من مسلسل إيقاع الحياة."],
+        year: 2025,
+        trailerId: "v3lU20T1",
+        isNew: true
+    },
+    {
+        id: 30,
+        title: "ارض الخضراء",
         titleEn: "Hayatın Ritmi",
         image: "https://placeholder.com/image/hayat.jpg",
         description: "قصة ملهمة حول موسيقيين شباب يسعون لتحقيق أحلامهم في إسطنبول.",
