@@ -20,7 +20,7 @@ const series1Data = [
         titleEn: "Eşref'in rüyası",
         image: "https://3esk.onl/wp-content/uploads/2025/09/esref-ruya-2.jpg",
         description: "انضم أشرف إلى المافيا وأصبح أحد أقوى رجالها، بينما يواصل بحثه لسنوات عن فتاة حلم بها وأسماها رؤيا. يقع في حب نيسان، دون أن يدرك أنها هي نفسها رؤيا، وأنها تعمل سراً كمخبرة للشرطة، ليجد نفسه عالقًا بين الحب والخيانة والصراع...",
-        year: 2024,
+        year: 2025,
         trailerId: "AE7PZDK1",
         isNew: true
     },
@@ -253,7 +253,68 @@ const series1Data = [
         year: 2025,
         trailerId: "v3lU20T1",
         isNew: true
+    },
+    {
+        id: 25,
+        title: "شراب التوت",
+        titleEn: "Hayatın Ritmi",
+        image: "https://placeholder.com/image/hayat.jpg",
+        description: "قصة ملهمة حول موسيقيين شباب يسعون لتحقيق أحلامهم في إسطنبول.",
+        year: 2025,
+        trailerId: "AE7PZDK1",
+        isNew: true
+    },
+    {
+        id: 6,
+        title: "الخروف",
+        titleEn: "Hayatın Ritmi",
+        image: "https://placeholder.com/image/hayat.jpg",
+        description: "قصة ملهمة حول موسيقيين شباب يسعون لتحقيق أحلامهم في إسطنبول.",
+        year: 2025,
+        trailerId: "AE7PZDK1",
+        isNew: true
+    },
+    {
+        id: 27,
+        title: "انت من",
+        titleEn: "Hayatın Ritmi",
+        image: "https://placeholder.com/image/hayat.jpg",
+        description: "قصة ملهمة حول موسيقيين شباب يسعون لتحقيق أحلامهم في إسطنبول.",
+        year: 2025,
+        trailerId: "v3lU20T1",
+        isNew: true
+    },
+    {
+        id: 28,
+        title: "الحياة",
+        titleEn: "Hayatın Ritmi",
+        image: "https://placeholder.com/image/hayat.jpg",
+        description: "قصة ملهمة حول موسيقيين شباب يسعون لتحقيق أحلامهم في إسطنبول.",
+        year: 2025,
+        trailerId: "v3lU20T1",
+        isNew: true
+    },
+    {
+        id: 29,
+        title: "إيقاع",
+        titleEn: "Hayatın Ritmi",
+        image: "https://placeholder.com/image/hayat.jpg",
+        description: "قصة ملهمة حول موسيقيين شباب يسعون لتحقيق أحلامهم في إسطنبول.",
+        year: 2025,
+        trailerId: "v3lU20T1",
+        isNew: true
+    },
+    {
+        id: 30,
+        title: "اطرق بابي",
+        titleEn: "Hayatın Ritmi",
+        image: "https://placeholder.com/image/hayat.jpg",
+        description: "قصة ملهمة حول موسيقيين شباب يسعون لتحقيق أحلامهم في إسطنبول.",
+        year: 2025,
+        trailerId: "AE7PZDK1",
+        isNew: true
     }
+    
 ];
 
 // Export for global use
