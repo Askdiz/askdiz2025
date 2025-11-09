@@ -257,5 +257,5 @@ const series1Data = [
 ];
 
 // Export for global use
-window.series1Data = series1Data;
+window.seriesData = series1Data;
 window.createPlaceholders = createPlaceholders;
