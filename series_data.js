@@ -427,17 +427,17 @@ seriesData[3].episodes.push(...placeholderData.episodes);
 seriesData[3].episodeDetails.push(...placeholderData.details);
 
 // إضافة حلقات وهمية للمسلسل رقم 5
-const placeholderData5 = createPlaceholders(3, 5, seriesData[4].title);
+const placeholderData5 = createPlaceholders(3, 500, seriesData[4].title);
 seriesData[4].episodes.push(...placeholderData5.episodes);
 seriesData[4].episodeDetails.push(...placeholderData5.details);
 
 // إضافة حلقات وهمية للمسلسل رقم 6
-const placeholderData6 = createPlaceholders(3, 3, seriesData[5].title);
+const placeholderData6 = createPlaceholders(3, 300, seriesData[5].title);
 seriesData[5].episodes.push(...placeholderData6.episodes);
 seriesData[5].episodeDetails.push(...placeholderData6.details);
 
 // إضافة حلقات وهمية للمسلسل رقم 7
-const placeholderData7 = createPlaceholders(3, 5, seriesData[6].title);
+const placeholderData7 = createPlaceholders(3, 5000, seriesData[6].title);
 seriesData[6].episodes.push(...placeholderData7.episodes);
 seriesData[6].episodeDetails.push(...placeholderData7.details);
 
